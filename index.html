@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Pencil Sketch App</title>
+    <style>
+        #preview {
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image to Pencil Sketch App</h1>
+    <input type="file" accept="image/*" id="uploadInput">
+    <div id="preview"></div>
+    <canvas id="sketchCanvas" style="display: none;"></canvas>
+
+    <script>
+        document.getElementById('uploadInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/convert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = function() {
+                    document.getElementById('preview').innerHTML = '';
+                    document.getElementById('preview').appendChild(img);
+                };
+                img.src = url;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
